@@ -10,11 +10,11 @@ from datetime import datetime
 
 DATABASE_URL = "postgres://default:nvE2XDt9NCRP@ep-patient-bonus-a48118n4.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require"
 
-#engine = create_engine('sqlite:///data.db', echo=True)
-engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
+engine = create_engine('sqlite:///data.db', echo=True)
+#engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True)
 
 Base = declarative_base()
-#Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
 
 DBSession = sessionmaker(bind=engine)
 
