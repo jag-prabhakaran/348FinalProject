@@ -148,3 +148,57 @@ def authenticate_user(username, password):
     user = session.query(User).filter_by(username=username, password=password).first()
     session.close()
     return user is not None
+
+
+def average_tasks_completed_per_week():
+    session = DBSession()
+    try:
+        # Get the count of completed tasks grouped by week of year
+        results = session.query(func.strftime('%Y-%W', Task.task_due_date), func.count(Task.task_title)).\
+            filter(Task.task_status == 'Done').\
+            group_by(func.strftime('%Y-%W', Task.task_due_date)).all()
+
+        # Calculate the average if results exist
+        if results:
+            week_count = len(results)
+            total_completed = sum(count for _, count in results)
+            average_per_week = total_completed / week_count
+            return average_per_week
+        return 0
+    finally:
+        session.close()
+
+
+def count_overdue_tasks():
+    today = datetime.now().date()
+    session = DBSession()
+    try:
+        overdue_count = session.query(func.count(Task.task_title)).\
+                        filter(Task.task_due_date < today, Task.task_status != 'Done').scalar()
+        return overdue_count
+    finally:
+        session.close()
+        
+def average_task_duration():
+    session = DBSession()
+    try:
+        durations = session.query(func.julianday(Task.task_due_date) - func.julianday(Task.created_date)).\
+                    filter(Task.task_status == 'Done').all()
+        if durations:
+            average_duration = sum(duration[0] for duration in durations) / len(durations)
+            return average_duration  # in days
+        return 0
+    finally:
+        session.close()
+        
+def task_completion_rate():
+    session = DBSession()
+    try:
+        total_tasks = session.query(func.count(Task.task_title)).scalar()
+        completed_tasks = session.query(func.count(Task.task_title)).filter(Task.task_status == 'Done').scalar()
+        if total_tasks > 0:
+            return (completed_tasks / total_tasks) * 100
+        return 0
+    finally:
+        session.close()
+

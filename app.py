@@ -70,6 +70,15 @@ def task_manager_app():
                 st.dataframe(high_priority_tasks[['Title', 'Status', 'Date', 'Description']])
             else:
                 st.write("")
+        
+        completion_rate = task_completion_rate()
+        st.write(f"### Task Completion Rate: {completion_rate:.2f}%")
+
+        # Number of overdue tasks
+        overdue_tasks = count_overdue_tasks()
+        st.write(f"### Number of Overdue Tasks: {overdue_tasks}")
+
+
 
 
     elif choice == "Create Task":
